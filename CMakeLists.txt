@@ -1,4 +1,13 @@
 cmake_minimum_required(VERSION 2.4.3)
+
+IF (USE_DOUBLE_PRECISION)
+  set( lib_type_suffix "-float64" )
+  set(CMAKE_RELEASE_POSTFIX "-float64")
+  set(CMAKE_RELWITHDEBINFO_POSTFIX "-float64")
+else()
+  set( lib_type_suffix "" )
+endif()
+
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 cmake_policy(SET CMP0017 NEW)
 #this line has to appear before 'PROJECT' in order to be able to disable incremental linking
@@ -472,10 +481,10 @@ IF(INSTALL_LIBS)
 	SET(INCLUDE_INSTALL_DIR "include/bullet/" CACHE PATH "The subdirectory to the header prefix")
 	SET(PKGCONFIG_INSTALL_PREFIX "lib${LIB_SUFFIX}/pkgconfig/" CACHE STRING "Base directory for pkgconfig files")
 	IF(NOT MSVC)
-	  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/bullet.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/bullet.pc @ONLY)
+	  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/bullet.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/bullet${lib_type_suffix}.pc @ONLY)
   	INSTALL(
 		FILES
-		${CMAKE_CURRENT_BINARY_DIR}/bullet.pc
+		${CMAKE_CURRENT_BINARY_DIR}/bullet${lib_type_suffix}.pc
 		DESTINATION
 		${PKGCONFIG_INSTALL_PREFIX})
 	ENDIF(NOT MSVC)
@@ -491,22 +500,22 @@ ENDIF()
 
 set (BULLET_CONFIG_CMAKE_PATH lib${LIB_SUFFIX}/cmake/bullet )
 list (APPEND BULLET_DEFINITIONS ${BULLET_DOUBLE_DEF})
-list (APPEND BULLET_LIBRARIES LinearMath)
-list (APPEND BULLET_LIBRARIES Bullet3Common)
-list (APPEND BULLET_LIBRARIES BulletInverseDynamics)
-list (APPEND BULLET_LIBRARIES BulletCollision)
-list (APPEND BULLET_LIBRARIES BulletDynamics)
-list (APPEND BULLET_LIBRARIES BulletSoftBody)
+list (APPEND BULLET_LIBRARIES LinearMath${lib_type_suffix})
+list (APPEND BULLET_LIBRARIES Bullet3Common${lib_type_suffix})
+list (APPEND BULLET_LIBRARIES BulletInverseDynamics${lib_type_suffix})
+list (APPEND BULLET_LIBRARIES BulletCollision${lib_type_suffix})
+list (APPEND BULLET_LIBRARIES BulletDynamics${lib_type_suffix})
+list (APPEND BULLET_LIBRARIES BulletSoftBody${lib_type_suffix})
 set (BULLET_USE_FILE ${BULLET_CONFIG_CMAKE_PATH}/UseBullet.cmake)
 configure_file 	( ${CMAKE_CURRENT_SOURCE_DIR}/BulletConfig.cmake.in
-					${CMAKE_CURRENT_BINARY_DIR}/BulletConfig.cmake
+					${CMAKE_CURRENT_BINARY_DIR}/BulletConfig${lib_type_suffix}.cmake
 					@ONLY ESCAPE_QUOTES
 				)
 OPTION(INSTALL_CMAKE_FILES "Install generated CMake files" ON)
 
 IF (INSTALL_CMAKE_FILES)
 	install ( FILES ${CMAKE_CURRENT_SOURCE_DIR}/UseBullet.cmake
-		${CMAKE_CURRENT_BINARY_DIR}/BulletConfig.cmake
+		${CMAKE_CURRENT_BINARY_DIR}/BulletConfig${lib_type_suffix}.cmake
 		DESTINATION ${BULLET_CONFIG_CMAKE_PATH}
 	)
 ENDIF (INSTALL_CMAKE_FILES)
